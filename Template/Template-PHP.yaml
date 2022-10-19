@@ -34,7 +34,7 @@ objects:
       port: 8080
       targetPort: 8080
     selector:
-      name: ${NAME}
+      name: ${NAME}      
 - apiVersion: route.openshift.io/v1
   kind: Route
   metadata:
@@ -61,7 +61,7 @@ objects:
       metadata:
         labels:
           name: ${NAME}
-        name: ${NAME}
+        name: ${NAME}    
       spec:
         containers:
         - env: []
@@ -87,7 +87,21 @@ objects:
               cpu: ${CPU_LIMIT}
             requests:
               memory: ${RES_MEMORY_LIMIT}
-              cpu: ${RES_CPU_LIMIT}              
+              cpu: ${RES_CPU_LIMIT}
+          volumeMounts:
+          - mountPath: /data/config.json
+            name: ${NAME}-config
+            subPath: config.json    
+        volumes:
+          - name: ${NAME}-config
+            projected:
+              sources:
+              - configMap:
+                  name: ${NAME}-config
+                  items:
+                    - key: config.json
+                      path: config.json
+                  defaultMode: 420
 parameters:
 - description: The name assigned to all of the stm Application objects defined in this template.
   displayName: Name
