@@ -1,8 +1,8 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 labels:
-  app: STM-${APP_NAME}
-  template: STM-php-example
+  app: stm-php-example
+  template: stm-php-example
 message: |-
   The following service(s) have been created in your project: ${NAME}.
   For more information about using this template, see Yannick
@@ -12,7 +12,14 @@ metadata:
       An example of PHP application deploy from an existing container image.
     iconClass: icon-php
     tags: quickstart,php
-  name: STM-${APP_NAME}
+    openshift.io/documentation-url: https://put_your_readme_url
+    openshift.io/long-description: This template defines resources needed to the existing STM application.
+    openshift.io/provider-display-name: STM, Inc.
+    openshift.io/support-url: https://put_your_readme_url   
+    template.openshift.io/bindable: "false"    
+  labels:
+    samples.operator.openshift.io/managed: "true"    
+  name: stm-php-example
   namespace: openshift
 objects:
 - apiVersion: v1
@@ -41,20 +48,14 @@ objects:
   kind: DeploymentConfig
   metadata:
     annotations:
-      description: Defines how to deploy the application
+      description: Defines how to deploy the application 
+      template.alpha.openshift.io/wait-for-ready: "true"
     name: ${NAME}
   spec:
     replicas: 1
     selector:
       name: ${NAME}
     strategy:
-      activeDeadlineSeconds: 21600
-      rollingParams:
-        intervalSeconds: 1
-        maxSurge: 25%
-        maxUnavailable: 25%
-        timeoutSeconds: 600
-        updatePeriodSeconds: 1
       type: Rolling
     template:
       metadata:
@@ -63,69 +64,62 @@ objects:
         name: ${NAME}
       spec:
         containers:
-          image: ''
-          imagePullPolicy: IfNotPresent
+        - env: []
+          image: ${IMAGE_ARTIFACTORY_LOCATION}
           livenessProbe:
             httpGet:
-              path: /health.php
+              path: /
               port: 8080
             initialDelaySeconds: 30
-            periodSeconds: 60
             timeoutSeconds: 3
-          name: {APP_NAME}
+          name: ${NAME}
           ports:
           - containerPort: 8080
           readinessProbe:
             httpGet:
-              path: /health.php
+              path: /
               port: 8080
             initialDelaySeconds: 3
-            periodSeconds: 60
             timeoutSeconds: 3
           resources:
             limits:
               memory: ${MEMORY_LIMIT}
               cpu: ${CPU_LIMIT}
             requests:
-              cpu: ${RES_MEMORY_LIMIT}
-              memory: ${RES_MEMORY_LIMIT}             
-    triggers:
-    - imageChangeParams:
-        automatic: true
-        containerNames:
-        - {APP_NAME}
-        from:
-          kind: ImageStreamTag
-          name: ${NAME}:latest
-      type: ImageChange
-    - type: ConfigChange
+              memory: ${RES_MEMORY_LIMIT}
+              cpu: ${RES_CPU_LIMIT}              
 parameters:
-- description: The name assigned to all of the STM Application objects defined in this template.
+- description: The name assigned to all of the stm Application objects defined in this template.
   displayName: Name
   name: NAME
   required: true
-  value: ${APP_NAME}
+  value: STM-APP-NAME
+- description: Artifactory Image location and tag
+  displayName: Artifactory Image location and tag
+  name: IMAGE_ARTIFACTORY_LOCATION
+  value: docker.io/appuio/example-php-docker-helloworld:latest
+  required: true 
 - description: Reserved amount of memory the Application container can use.
-  displayName: Memory Limit
+  displayName: Reserved Memory Limit in Meg(Mi) or Gig (Gi)
   name: RES_MEMORY_LIMIT
   required: true
   value: 256Mi
 - description: Reserved amount of cpu the Application container can use.
-  displayName: Memory Limit
+  displayName: Reserved Cpu Limit in Milicore(m) or a full CPU count (1)
   name: RES_CPU_LIMIT
   required: true
   value: 100m
 - description: Maximum amount of memory the Application container can use.
-  displayName: Memory Limit
+  displayName: Maximum Memory Limit in Meg(Mi) or Gig (Gi)
   name: MEMORY_LIMIT
   required: true
   value: 512Mi
 - description: Maximum amount of cpu the Application container can use.
-  displayName: Memory Limit
+  displayName: Maximum Cpu Limit in Milicore(m) or a full CPU count (1)
   name: CPU_LIMIT
   required: true
   value: 250m    
-- description: The exposed hostname that will route to the STM Application service, if left
+- description: The exposed hostname that will route to the stm Application service, if left
     blank a value will be defaulted.
   displayName: Application Hostname
   name: APPLICATION_DOMAIN
