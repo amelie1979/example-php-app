@@ -1,0 +1,72 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  annotations:
+    app.openshift.io/route-disabled: "false"
+  labels:
+    app: php-frontend
+    app.kubernetes.io/component: php-frontend
+    app.kubernetes.io/instance: php-frontend
+    app.kubernetes.io/name: php-frontend
+    app.kubernetes.io/part-of: php-app
+    app.openshift.io/runtime: php
+    app.openshift.io/runtime-namespace: amelie-demo
+  name: php-frontend
+  namespace: amelie-demo
+spec:
+  replicas: 2
+  revisionHistoryLimit: 10
+  selector:
+    app: php-frontend
+    deploymentconfig: php-frontend
+  strategy:
+    activeDeadlineSeconds: 21600
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      annotations:
+        openshift.io/generated-by: OpenShiftWebConsole
+      creationTimestamp: null
+      labels:
+        app: php-frontend
+        deploymentconfig: php-frontend
+    spec:
+      containers:
+      - image: sha256:a8bb54b56a6f38252bd0ceb70db9498c9e45ca295fd986eb52ee7f34d0c14d26
+        imagePullPolicy: IfNotPresent
+        name: php-frontend
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 100m
+            memory: 512Mi
+          requests:
+            cpu: 50m
+            memory: 250Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      terminationGracePeriodSeconds: 30
+  test: false
+  triggers:
+  - imageChangeParams:
+      automatic: true
+      containerNames:
+      - php-frontend
+      from:
+        kind: ImageStreamTag
+        name: php-frontend:8.1.12RC1-zts-alpine3.16
+        namespace: amelie-demo
+    type: ImageChange
+  - type: ConfigChange
+

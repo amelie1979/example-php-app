@@ -1,0 +1,132 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+labels:
+  app: STM-${APP_NAME}
+  template: STM-php-example
+message: |-
+  The following service(s) have been created in your project: ${NAME}.
+  For more information about using this template, see Yannick
+metadata:
+  annotations:
+    description: |-
+      An example of PHP application deploy from an existing container image.
+    iconClass: icon-php
+    tags: quickstart,php
+  name: STM-${APP_NAME}
+  namespace: openshift
+objects:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      description: Exposes and load balances the application pods
+    name: ${NAME}
+  spec:
+    ports:
+    - name: web
+      port: 8080
+      targetPort: 8080
+    selector:
+      name: ${NAME}
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    name: ${NAME}
+  spec:
+    host: ${APPLICATION_DOMAIN}
+    to:
+      kind: Service
+      name: ${NAME}
+- apiVersion: apps.openshift.io/v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+      description: Defines how to deploy the application
+    name: ${NAME}
+  spec:
+    replicas: 1
+    selector:
+      name: ${NAME}
+    strategy:
+      activeDeadlineSeconds: 21600
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        labels:
+          name: ${NAME}
+        name: ${NAME}
+      spec:
+        containers:
+          image: ''
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            httpGet:
+              path: /health.php
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 60
+            timeoutSeconds: 3
+          name: {APP_NAME}
+          ports:
+          - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /health.php
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 60
+            timeoutSeconds: 3
+          resources:
+            limits:
+              memory: ${MEMORY_LIMIT}
+              cpu: ${CPU_LIMIT}
+            requests:
+              cpu: ${RES_MEMORY_LIMIT}
+              memory: ${RES_MEMORY_LIMIT}             
+    triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - {APP_NAME}
+        from:
+          kind: ImageStreamTag
+          name: ${NAME}:latest
+      type: ImageChange
+    - type: ConfigChange
+parameters:
+- description: The name assigned to all of the STM Application objects defined in this template.
+  displayName: Name
+  name: NAME
+  required: true
+  value: ${APP_NAME}
+- description: Reserved amount of memory the Application container can use.
+  displayName: Memory Limit
+  name: RES_MEMORY_LIMIT
+  required: true
+  value: 256Mi
+- description: Reserved amount of cpu the Application container can use.
+  displayName: Memory Limit
+  name: RES_CPU_LIMIT
+  required: true
+  value: 100m
+- description: Maximum amount of memory the Application container can use.
+  displayName: Memory Limit
+  name: MEMORY_LIMIT
+  required: true
+  value: 512Mi
+- description: Maximum amount of cpu the Application container can use.
+  displayName: Memory Limit
+  name: CPU_LIMIT
+  required: true
+  value: 250m    
+- description: The exposed hostname that will route to the STM Application service, if left
+    blank a value will be defaulted.
+  displayName: Application Hostname
+  name: APPLICATION_DOMAIN
+
