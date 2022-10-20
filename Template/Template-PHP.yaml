@@ -1,8 +1,8 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 labels:
-  app: stm-php-example
-  template: stm-php-example
+  app: abc-php-example
+  template: abc-php-example
 message: |-
   The following service(s) have been created in your project: ${NAME}.
   For more information about using this template, see Yannick
@@ -13,13 +13,13 @@ metadata:
     iconClass: icon-php
     tags: quickstart,php
     openshift.io/documentation-url: https://put_your_readme_url
-    openshift.io/long-description: This template defines resources needed to the existing STM application.
-    openshift.io/provider-display-name: STM, Inc.
+    openshift.io/long-description: This template defines resources needed to the existing ABC application.
+    openshift.io/provider-display-name: ABC, Inc.
     openshift.io/support-url: https://put_your_readme_url   
     template.openshift.io/bindable: "false"    
   labels:
     samples.operator.openshift.io/managed: "true"    
-  name: stm-php-example
+  name: abc-php-example
   namespace: openshift
 objects:
 - apiVersion: v1
@@ -137,11 +137,11 @@ objects:
                       path: config.json
                   defaultMode: 420
 parameters:
-- description: The name assigned to all of the stm Application objects defined in this template.
+- description: The name assigned to all of the ABC Inc. Application objects defined in this template.
   displayName: Name
   name: NAME
   required: true
-  value: STM-APP-NAME
+  value: ABC-APP-NAME
 - description: Artifactory Image location and tag
   displayName: Artifactory Image location and tag
   name: IMAGE_ARTIFACTORY_LOCATION
@@ -167,7 +167,7 @@ parameters:
   name: CPU_LIMIT
   required: true
   value: 250m    
-- description: The exposed hostname that will route to the stm Application service, if left
+- description: The exposed hostname that will route to the abc inc. Application service, if left
     blank a value will be defaulted.
   displayName: Application Hostname
   name: APPLICATION_DOMAIN
