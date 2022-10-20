@@ -1,0 +1,14 @@
+Error: Error invoking kubectl as [kubectl get -o json dc stmapp1] exit status 1
+Usage:
+  kubectl-neat get [flags]
+
+Examples:
+kubectl neat get -- pod mypod -oyaml
+kubectl neat get -- svc -n default myservice --output json
+
+Flags:
+  -h, --help   help for get
+
+Global Flags:
+  -o, --output string   output format: yaml or json (default "yaml")
+

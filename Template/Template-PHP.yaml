@@ -44,6 +44,22 @@ objects:
     to:
       kind: Service
       name: ${NAME}
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    name: ${NAME}
+  spec:
+    dockerImageRepository: ${IMAGE_ARTIFACTORY_LOCATION}
+    lookupPolicy:
+      local: false
+    tags:
+    - annotations: null
+      from:
+        kind: DockerImage
+        name: ${IMAGE_ARTIFACTORY_LOCATION}
+      name: latest
+      referencePolicy:
+        type: Source      
 - apiVersion: apps.openshift.io/v1
   kind: DeploymentConfig
   metadata:
@@ -57,6 +73,24 @@ objects:
       name: ${NAME}
     strategy:
       type: Rolling
+      rollingParams:
+        updatePeriodSeconds: 1
+        intervalSeconds: 1
+        timeoutSeconds: 600
+        maxUnavailable: 25%
+        maxSurge: 25%
+      resources: {}
+      activeDeadlineSeconds: 21600      
+    triggers:
+      - type: ImageChange
+        imageChangeParams:
+          automatic: true
+          containerNames:
+            - ${NAME}
+          from:
+            kind: ImageStreamTag
+            name: '${NAME}:latest'
+      - type: ConfigChange
     template:
       metadata:
         labels:
@@ -111,7 +145,7 @@ parameters:
 - description: Artifactory Image location and tag
   displayName: Artifactory Image location and tag
   name: IMAGE_ARTIFACTORY_LOCATION
-  value: docker.io/appuio/example-php-docker-helloworld:latest
+  value: docker.io/appuio/example-php-docker-helloworld
   required: true 
 - description: Reserved amount of memory the Application container can use.
   displayName: Reserved Memory Limit in Meg(Mi) or Gig (Gi)
