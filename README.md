@@ -42,7 +42,6 @@ oc new-app --template=abc-php-example --param=NAME=${app_name} --param=IMAGE_ART
 ## Prendre les yaml générés en copie et les garder pour la gestion en jour2 des configurations kubernetes
 
 ```
-cd template
 
 kubectl neat get dc ${app_name} -o yaml > template/${app_name}-dc.yaml
 
