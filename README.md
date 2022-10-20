@@ -26,20 +26,20 @@ oc new-project demo-abc
 export app_name=abcapp1
 ```
 
-## Création des objets sécure (confgimap & secrets & credential pour le registre d'image externe) (dans mon repo les config sont sous le répertoire config)
+## Création des objets sécures (confgimaps & secrets & credential pour le registre d'image externe) (dans mon repo les config sont sous le répertoire config)
 
 ```
 
 oc create configmap ${app_name}-config --from-file=config/config.json
 ```
 
-## Example de déploiement en command line avec paramètres (remplacer le paramètre de l'image par la vôtre) (cet example est http et non https)
+## Example de déploiement en command line avec paramètres (remplacer le paramètre de l'image par la vôtre sans le tag) (cet example est http et non https)
 ```
 oc new-app --template=abc-php-example --param=NAME=${app_name} --param=IMAGE_ARTIFACTORY_LOCATION=docker.io/appuio/example-php-docker-helloworld
 ```
 
 # Activité en jour 2
-## Prendre les yaml généré en copie et les garder pour la gestion en jour2 des configurations kubernetes
+## Prendre les yaml générés en copie et les garder pour la gestion en jour2 des configurations kubernetes
 
 ```
 cd template
