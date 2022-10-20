@@ -142,8 +142,8 @@ parameters:
   name: NAME
   required: true
   value: ABC-APP-NAME
-- description: Artifactory Image location and tag
-  displayName: Artifactory Image location and tag
+- description: Artifactory Image location 
+  displayName: Artifactory Image location 
   name: IMAGE_ARTIFACTORY_LOCATION
   value: docker.io/appuio/example-php-docker-helloworld
   required: true 
